@@ -60,20 +60,8 @@ class UnityEnv(gym.Env):
         self.name = self._env.academy_name
         self.brains = self._env.brains
         self.brain_names = self._env.brain_names
-
-        if len(self._env.external_brain_names) <= 0:
-            raise UnityGymException(
-                "There are not any external brain in the UnityEnvironment"
-            )
-
-        # # Check for number of agents in scene.
-        # initial_info = self._env.reset()
-        # self._check_agents(len(initial_info.agents))
-
-
         self.action_space = {}
         self.observation_space = {}
-
 
         # Set observation and action spaces
         for brain_name in self.brain_names:
@@ -246,29 +234,29 @@ class UnityEnv(gym.Env):
 #                 "initialization. This is not supported."
 #             )
 
-    @property
-    def metadata(self):
-        return {"render.modes": ["rgb_array"]}
+    # @property
+    # def metadata(self):
+    #     return {"render.modes": ["rgb_array"]}
 
-    @property
-    def reward_range(self):
-        return -float("inf"), float("inf")
+    # @property
+    # def reward_range(self):
+    #     return -float("inf"), float("inf")
 
-    @property
-    def spec(self):
-        return None
+    # @property
+    # def spec(self):
+    #     return None
 
-    @property
-    def action_space(self):
-        return self.action_space
+    # @property
+    # def action_space(self):
+    #     return self.action_space
 
-    @property
-    def observation_space(self):
-        return self.observation_space
+    # @property
+    # def observation_space(self):
+    #     return self.observation_space
 
-    @property
-    def number_agents(self):
-        return self.agents
+    # @property
+    # def number_agents(self):
+    #     return self.agents
 
 
 class ActionFlattener:
