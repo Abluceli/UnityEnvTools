@@ -5,7 +5,6 @@ import numpy as np
 from mlagents.envs import UnityEnvironment
 from gym import error, spaces
 
-
 class UnityGymException(error.Error):
     """
     Any error related to the gym wrapper of ml-agents.
@@ -59,63 +58,37 @@ class UnityEnv(gym.Env):
             file_name=environment_filename, worker_id=worker_id, no_graphics=no_graphics
         )
         self.name = self._env.academy_name
-        # self.visual_obs = None
-        # self._current_state = None
-        # self._n_agents = None
-        
-        # self._flattener = None
-        # self.game_over = (
-        #     False
-        # )  # Hidden flag used by Atari environments to determine if the game is over
-        self._multibrain = multibrain
-        self._multiagent = multiagent
-        self._use_visual = use_visual
-        self._uint8_visual = uint8_visual
-        self._flatten_branched = flatten_branched
-        self._allow_multiple_visual_obs = allow_multiple_visual_obs
+        self.brains = self._env.brains
+        self.brain_names = self._env.brain_names
 
-        # Check brain configuration
-    
         if len(self._env.external_brain_names) <= 0:
             raise UnityGymException(
                 "There are not any external brain in the UnityEnvironment"
             )
+        
+        
 
-        self.brain_name = self._env.external_brain_names[0]
-        brain = self._env.brains[self.brain_name]
+    
 
-        if use_visual and brain.number_visual_observations == 0:
-            raise UnityGymException(
-                "`use_visual` was set to True, however there are no"
-                " visual observations as part of this environment."
-            )
-        self.use_visual = brain.number_visual_observations >= 1 and use_visual
+        # if brain.number_visual_observations > 1 and not self._allow_multiple_visual_obs:
+        #     logger.warning(
+        #         "The environment contains more than one visual observation. "
+        #         "You must define allow_multiple_visual_obs=True to received them all. "
+        #         "Otherwise, please note that only the first will be provided in the observation."
+        #     )
 
-        if not use_visual and uint8_visual:
-            logger.warning(
-                "`uint8_visual was set to true, but visual observations are not in use. "
-                "This setting will not have any effect."
-            )
-        else:
-            self.uint8_visual = uint8_visual
-
-        if brain.number_visual_observations > 1 and not self._allow_multiple_visual_obs:
-            logger.warning(
-                "The environment contains more than one visual observation. "
-                "You must define allow_multiple_visual_obs=True to received them all. "
-                "Otherwise, please note that only the first will be provided in the observation."
-            )
-
-        if brain.num_stacked_vector_observations != 1:
-            raise UnityGymException(
-                "There can only be one stacked vector observation in a UnityEnvironment "
-                "if it is wrapped in a gym."
-            )
+        # if brain.num_stacked_vector_observations != 1:
+        #     raise UnityGymException(
+        #         "There can only be one stacked vector observation in a UnityEnvironment "
+        #         "if it is wrapped in a gym."
+        #     )
 
         # Check for number of agents in scene.
         initial_info = self._env.reset()[self.brain_name]
         self._check_agents(len(initial_info.agents))
 
+
+        self.
         # Set observation and action spaces
         if brain.vector_action_space_type == "discrete":
             if len(brain.vector_action_space_size) == 1:
