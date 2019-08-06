@@ -101,7 +101,7 @@ class UnityEnv(gym.Env):
                 self.action_space[brain_name] = spaces.Box(-high, high, dtype=np.float32)
             #np.inf mean the max number in python
             high = np.array([np.inf] * brain.vector_observation_space_size)
-            self.action_meanings = brain.vector_action_descriptions
+            #self.action_meanings = brain.vector_action_descriptions
             if use_visual:
                 if brain.camera_resolutions[0]["blackAndWhite"]:
                     depth = 1
@@ -126,107 +126,81 @@ class UnityEnv(gym.Env):
         Returns: observation (object/list): the initial observation of the
             space.
         """
-        print("start")
+       
         info_all = self._env.reset()
-        print("end")
+        self.agents = {}
         obs = {}
         for brain_name in self.brain_names:
-            
             brain_info = info_all[brain_name]
             obs[brain_name] = brain_info.vector_observations
+            self.agents[brain_name] = len(brain_info.vector_observations)
         return obs
 
-#     def step(self, action):
-#         """Run one timestep of the environment's dynamics. When end of
-#         episode is reached, you are responsible for calling `reset()`
-#         to reset this environment's state.
-#         Accepts an action and returns a tuple (observation, reward, done, info).
-#         In the case of multi-agent environments, these are lists.
-#         Args:
-#             action (object/list): an action provided by the environment
-#         Returns:
-#             observation (object/list): agent's observation of the current environment
-#             reward (float/list) : amount of reward returned after previous action
-#             done (boolean/list): whether the episode has ended.
-#             info (dict): contains auxiliary diagnostic information, including BrainInfo.
-#         """
+    def step(self, action):
+        """Run one timestep of the environment's dynamics. When end of
+        episode is reached, you are responsible for calling `reset()`
+        to reset this environment's state.
+        Accepts an action and returns a tuple (observation, reward, done, info).
+        In the case of multi-agent environments, these are lists.
+        Args:
+            action (object/list): an action provided by the environment
+        Returns:
+            observation (object/list): agent's observation of the current environment
+            reward (float/list) : amount of reward returned after previous action
+            done (boolean/list): whether the episode has ended.
+            info (dict): contains auxiliary diagnostic information, including BrainInfo.
+        """
 
-#         # Use random actions for all other agents in environment.
-#         if self._multiagent:
-#             if not isinstance(action, list):
-#                 raise UnityGymException(
-#                     "The environment was expecting `action` to be a list."
-#                 )
-#             if len(action) != self._n_agents:
-#                 raise UnityGymException(
-#                     "The environment was expecting a list of {} actions.".format(
-#                         self._n_agents
-#                     )
-#                 )
-#             else:
-#                 if self._flattener is not None:
-#                     # Action space is discrete and flattened - we expect a list of scalars
-#                     action = [self._flattener.lookup_action(_act) for _act in action]
-#                 action = np.array(action)
-#         else:
-#             if self._flattener is not None:
-#                 # Translate action into list
-#                 action = self._flattener.lookup_action(action)
+        # Use random actions for all other agents in environment.
+        # if self._multiagent:
+        #     if not isinstance(action, list):
+        #         raise UnityGymException(
+        #             "The environment was expecting `action` to be a list."
+        #         )
+        #     if len(action) != self._n_agents:
+        #         raise UnityGymException(
+        #             "The environment was expecting a list of {} actions.".format(
+        #                 self._n_agents
+        #             )
+        #         )
+        #     else:
+        #         if self._flattener is not None:
+        #             # Action space is discrete and flattened - we expect a list of scalars
+        #             action = [self._flattener.lookup_action(_act) for _act in action]
+        #         action = np.array(action)
+        # else:
+        #     if self._flattener is not None:
+        #         # Translate action into list
+        #         action = self._flattener.lookup_action(action)
 
-#         info = self._env.step(action)[self.brain_name]
-#         n_agents = len(info.agents)
-#         self._check_agents(n_agents)
-#         self._current_state = info
+        info_all = self._env.step(action)
+        obs = {}
+        reward = {}
+        done = {}
+        
+        for brain_name in self.brain_names:
+            brain_info = info_all[brain_name]
+            obs[brain_name] = brain_info.vector_observations
+            reward[brain_name] = brain_info.rewards
+            done[brain_name] = brain_info.local_done
+        # n_agents = len(info.agents)
+        # self._check_agents(n_agents)
+        # self._current_state = info
 
-#         if not self._multiagent:
-#             obs, reward, done, info = self._single_step(info)
-#             self.game_over = done
-#         else:
-#             obs, reward, done, info = self._multi_step(info)
-#             self.game_over = all(done)
-#         return obs, reward, done, info
+        # if not self._multiagent:
+        #     obs, reward, done, info = self._single_step(info)
+        #     self.game_over = done
+        # else:
+        #     obs, reward, done, info = self._multi_step(info)
+        #     self.game_over = all(done)
+        return obs, reward, done, "info"
 
-#     def _single_step(self, info):
-#         if self.use_visual:
-#             visual_obs = info.visual_observations
-
-#             if self._allow_multiple_visual_obs:
-#                 visual_obs_list = []
-#                 for obs in visual_obs:
-#                     visual_obs_list.append(self._preprocess_single(obs[0]))
-#                 self.visual_obs = visual_obs_list
-#             else:
-#                 self.visual_obs = self._preprocess_single(visual_obs[0][0])
-
-#             default_observation = self.visual_obs
-#         else:
-#             default_observation = info.vector_observations[0, :]
-
-#         return (
-#             default_observation,
-#             info.rewards[0],
-#             info.local_done[0],
-#             {"text_observation": info.text_observations[0], "brain_info": info},
-#         )
 
 #     def _preprocess_single(self, single_visual_obs):
 #         if self.uint8_visual:
 #             return (255.0 * single_visual_obs).astype(np.uint8)
 #         else:
 #             return single_visual_obs
-
-#     def _multi_step(self, info):
-#         if self.use_visual:
-#             self.visual_obs = self._preprocess_multi(info.visual_observations)
-#             default_observation = self.visual_obs
-#         else:
-#             default_observation = info.vector_observations
-#         return (
-#             list(default_observation),
-#             info.rewards,
-#             info.local_done,
-#             {"text_observation": info.text_observations, "brain_info": info},
-#         )
 
 #     def _preprocess_multi(self, multiple_visual_obs):
 #         if self.uint8_visual:
@@ -237,8 +211,8 @@ class UnityEnv(gym.Env):
 #         else:
 #             return multiple_visual_obs
 
-#     def render(self, mode="rgb_array"):
-#         return self.visual_obs
+    def render(self, mode="rgb_array"):
+        pass
 
     def close(self):
         """Override _close in your subclass to perform any necessary cleanup.
@@ -247,15 +221,10 @@ class UnityEnv(gym.Env):
         """
         self._env.close()
 
-#     def get_action_meanings(self):
-#         return self.action_meanings
 
-#     def seed(self, seed=None):
-#         """Sets the seed for this env's random number generator(s).
-#         Currently not implemented.
-#         """
-#         logger.warn("Could not seed environment %s", self.name)
-#         return
+
+    def seed(self, seed=None):
+        pass
 
 #     def _check_agents(self, n_agents):
 #         if not self._multiagent and n_agents > 1:
@@ -277,29 +246,29 @@ class UnityEnv(gym.Env):
 #                 "initialization. This is not supported."
 #             )
 
-#     @property
-#     def metadata(self):
-#         return {"render.modes": ["rgb_array"]}
+    @property
+    def metadata(self):
+        return {"render.modes": ["rgb_array"]}
 
-#     @property
-#     def reward_range(self):
-#         return -float("inf"), float("inf")
+    @property
+    def reward_range(self):
+        return -float("inf"), float("inf")
 
-#     @property
-#     def spec(self):
-#         return None
+    @property
+    def spec(self):
+        return None
 
-#     @property
-#     def action_space(self):
-#         return self._action_space
+    @property
+    def action_space(self):
+        return self.action_space
 
-#     @property
-#     def observation_space(self):
-#         return self._observation_space
+    @property
+    def observation_space(self):
+        return self.observation_space
 
-#     @property
-#     def number_agents(self):
-#         return self._n_agents
+    @property
+    def number_agents(self):
+        return self.agents
 
 
 class ActionFlattener:

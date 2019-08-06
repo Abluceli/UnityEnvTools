@@ -2,16 +2,17 @@ from UnityEnv import UnityEnv
 from mlagents.envs import UnityEnvironment
 
 if __name__ == "__main__":
-    env = UnityEnvironment(file_name='/Users/liyang/Code/UnityEnv/Soccer', worker_id=0, no_graphics=True)
-    # #env = UnityEnvironment(file_name='UnityEnvTools/soccer/soccer', worker_id=1, no_graphics=True)
-    # print(env.action_space)
-    # print(env.observation_space)
-    # print(env.brain_names)
-    # print(env.brains)
-    # print(env.observation_space)
-    # print(env.action_space)
-    # obs = env.reset()
-    # print(obs)
-    # env.close()
-    info = env.reset()
-    env.close
+    env = UnityEnv(environment_filename='/Users/liyang/Code/UnityEnv/ship', worker_id=0, no_graphics=False)
+
+    print(env.brain_names)
+    print(env.brains)
+    print(env.observation_space)
+    print(env.action_space)
+    obs = env.reset()
+    for i in range(2000):
+        action = {}
+        for brain_name in env.brain_names:
+            action[brain_name] = env.action_space[brain_name].sample()
+        obs, reward, done, info = env.step(action)
+    env.close()
+  
