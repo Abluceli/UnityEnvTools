@@ -88,7 +88,7 @@ class UnityEnv(gym.Env):
                 high = np.array([1] * brain.vector_action_space_size[0])
                 self.action_space[brain_name] = spaces.Box(-high, high, dtype=np.float32)
             #np.inf mean the max number in python
-            high = np.array([np.inf] * brain.vector_observation_space_size)
+            high = np.array([np.inf] * brain.vector_observation_space_size * brain.num_stacked_vector_observations)
             #self.action_meanings = brain.vector_action_descriptions
             if use_visual:
                 if brain.camera_resolutions[0]["blackAndWhite"]:
