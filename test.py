@@ -17,3 +17,5 @@ if __name__ == "__main__":
         print(obs,reward,done)
     env.close()
   
+
+  
