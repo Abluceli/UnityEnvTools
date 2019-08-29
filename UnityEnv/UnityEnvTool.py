@@ -32,7 +32,7 @@ class UnityEnv(gym.Env):
 
     def __init__(
         self,
-        environment_filename: str,
+        environment_filename: str = None,
         worker_id: int = 0,
         no_graphics: bool = False,
         multibrain: bool = False,
@@ -54,9 +54,12 @@ class UnityEnv(gym.Env):
         :param no_graphics: Whether to run the Unity simulator in no-graphics mode
         :param allow_multiple_visual_obs: If True, return a list of visual observations instead of only one.
         """
-        self._env = UnityEnvironment(
-            file_name=environment_filename, worker_id=worker_id, no_graphics=no_graphics
-        )
+        if environment_filename == None:
+            self._env = UnityEnvironment(worker_id=worker_id, no_graphics=no_graphics)
+        else:
+            self._env = UnityEnvironment(
+                file_name=environment_filename, worker_id=worker_id, no_graphics=no_graphics
+            )
         self.name = self._env.academy_name
         self.brains = self._env.brains
         self.brain_names = self._env.brain_names
@@ -74,10 +77,9 @@ class UnityEnv(gym.Env):
                     #     self._flattener = ActionFlattener(brain.vector_action_space_size)
                     #     self._action_space = self._flattener.action_space
                     # else:
-                    #     self._action_space = spaces.MultiDiscrete(
-                    #         brain.vector_action_space_size
-                    #     )
-                    pass
+                    self.action_space[brain_name] = spaces.MultiDiscrete(
+                        brain.vector_action_space_size
+                    )
 
             else:
                 if flatten_branched:

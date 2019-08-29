@@ -3,15 +3,16 @@ from mlagents.envs import UnityEnvironment
 import numpy as np
 
 if __name__ == "__main__":
-    env = UnityEnv(environment_filename='/Users/liyang/Code/UnityEnv/walker', worker_id=0, no_graphics=False)
+    # env = UnityEnv(environment_filename='/Users/liyang/Code/UnityEnv/walker', worker_id=0, no_graphics=False)
     #env = UnityEnvironment(file_name='/Users/liyang/Code/UnityEnv/walker')
+    env = UnityEnv()
     print(env.brain_names)
     print(env.brains)
     print(env.observation_space)
     print(env.action_space)
     obs = env.reset()
     print(env.agents)
-    for i in range(1):
+    for i in range(10000):
         action = {}
         for brain_name in env.brain_names:
             action[brain_name] = env.action_space[brain_name].sample()
