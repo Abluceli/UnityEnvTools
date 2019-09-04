@@ -6,7 +6,7 @@ import pickle
 
 import maddpg.common.tf_util as U
 from maddpg.trainer.maddpg import MADDPGAgentTrainer
-import tensorflow.contrib.layers as layers
+from tensorflow.contrib import layers
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")

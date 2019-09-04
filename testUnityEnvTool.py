@@ -1,5 +1,5 @@
 from UnityEnv.UnityEnvTool import UnityEnv
-from mlagents.envs import UnityEnvironment
+#from envs import UnityEnvironment
 import numpy as np
 
 if __name__ == "__main__":
@@ -12,10 +12,11 @@ if __name__ == "__main__":
     print(env.action_space)
     obs = env.reset()
     print(env.agents)
+    print(env.n)
     for i in range(10000):
-        action = {}
+        action = []
         for brain_name in env.brain_names:
-            action[brain_name] = env.action_space[brain_name].sample()
+            action.append(env.action_space[env.brain_names.index(brain_name)].sample())
         obs, reward, done, info = env.step(action)
         
     # info = env.reset()[env.brain_names[0]]

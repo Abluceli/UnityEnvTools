@@ -1,12 +1,16 @@
 import logging
 import grpc
+from typing import Optional
 
 import socket
 from multiprocessing import Pipe
 from concurrent.futures import ThreadPoolExecutor
 
 from .communicator import Communicator
-from .communicator_objects import UnityToExternalServicer, add_UnityToExternalServicer_to_server
+from .communicator_objects import (
+    UnityToExternalServicer,
+    add_UnityToExternalServicer_to_server,
+)
 from .communicator_objects import UnityMessage, UnityInput, UnityOutput
 from .exception import UnityTimeOutException, UnityWorkerInUseException
 
@@ -27,7 +31,7 @@ class UnityToExternalServicerImplementation(UnityToExternalServicer):
 
 
 class RpcCommunicator(Communicator):
-    def __init__(self, worker_id=0, base_port=5005):
+    def __init__(self, worker_id=0, base_port=5005, timeout_wait=30):
         """
         Python side of the grpc communication. Python is the server and Unity the client
 
@@ -37,6 +41,7 @@ class RpcCommunicator(Communicator):
         """
         self.port = base_port + worker_id
         self.worker_id = worker_id
+        self.timeout_wait = timeout_wait
         self.server = None
         self.unity_to_external = None
         self.is_open = False
@@ -53,10 +58,12 @@ class RpcCommunicator(Communicator):
             self.server = grpc.server(ThreadPoolExecutor(max_workers=10))
             self.unity_to_external = UnityToExternalServicerImplementation()
             add_UnityToExternalServicer_to_server(self.unity_to_external, self.server)
-            self.server.add_insecure_port('localhost:' + str(self.port))
+            # Using unspecified address, which means that grpc is communicating on all IPs
+            # This is so that the docker container can connect.
+            self.server.add_insecure_port("[::]:" + str(self.port))
             self.server.start()
             self.is_open = True
-        except:
+        except Exception:
             raise UnityWorkerInUseException(self.worker_id)
 
     def check_port(self, port):
@@ -72,12 +79,14 @@ class RpcCommunicator(Communicator):
             s.close()
 
     def initialize(self, inputs: UnityInput) -> UnityOutput:
-        if not self.unity_to_external.parent_conn.poll(30):
+        if not self.unity_to_external.parent_conn.poll(self.timeout_wait):
             raise UnityTimeOutException(
                 "The Unity environment took too long to respond. Make sure that :\n"
                 "\t The environment does not need user interaction to launch\n"
-                "\t The Academy and the External Brain(s) are attached to objects in the Scene\n"
-                "\t The environment and the Python interface have compatible versions.")
+                "\t The Academy's Broadcast Hub is configured correctly\n"
+                "\t The Agents are linked to the appropriate Brains\n"
+                "\t The environment and the Python interface have compatible versions."
+            )
         aca_param = self.unity_to_external.parent_conn.recv().unity_output
         message = UnityMessage()
         message.header.status = 200
@@ -86,7 +95,7 @@ class RpcCommunicator(Communicator):
         self.unity_to_external.parent_conn.recv()
         return aca_param
 
-    def exchange(self, inputs: UnityInput) -> UnityOutput:
+    def exchange(self, inputs: UnityInput) -> Optional[UnityOutput]:
         message = UnityMessage()
         message.header.status = 200
         message.unity_input.CopyFrom(inputs)

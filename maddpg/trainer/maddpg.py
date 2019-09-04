@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import tensorflow as tf
-import maddpg.common.tf_util as U
+from maddpg.common import tf_util as U
 
 from maddpg.common.distributions import make_pdtype
 from maddpg import AgentTrainer

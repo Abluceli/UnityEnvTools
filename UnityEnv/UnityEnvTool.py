@@ -63,32 +63,27 @@ class UnityEnv(gym.Env):
         self.name = self._env.academy_name
         self.brains = self._env.brains
         self.brain_names = self._env.brain_names
-        self.action_space = {}
-        self.observation_space = {}
-
+        self.action_space = []
+        self.observation_space = []
+        self.n = len(self.brains)
         # Set observation and action spaces
         for brain_name in self.brain_names:
             brain = self.brains[brain_name]
             if brain.vector_action_space_type == "discrete":
                 if len(brain.vector_action_space_size) == 1:
-                    self.action_space[brain_name] = spaces.Discrete(brain.vector_action_space_size[0])
+                    self.action_space.append(spaces.Discrete(brain.vector_action_space_size[0]))
                 else:
                     # if flatten_branched:
                     #     self._flattener = ActionFlattener(brain.vector_action_space_size)
                     #     self._action_space = self._flattener.action_space
                     # else:
-                    self.action_space[brain_name] = spaces.MultiDiscrete(
+                    self.action_space.append(spaces.MultiDiscrete(
                         brain.vector_action_space_size
-                    )
+                    ))
 
             else:
-                if flatten_branched:
-                    logger.warning(
-                        "The environment has a non-discrete action space. It will "
-                        "not be flattened."
-                    )
                 high = np.array([1] * brain.vector_action_space_size[0])
-                self.action_space[brain_name] = spaces.Box(-high, high, dtype=np.float32)
+                self.action_space.append(spaces.Box(-high, high, dtype=np.float32))
             #np.inf mean the max number in python
             high = np.array([np.inf] * brain.vector_observation_space_size * brain.num_stacked_vector_observations)
             #self.action_meanings = brain.vector_action_descriptions
@@ -108,7 +103,7 @@ class UnityEnv(gym.Env):
                     ),
                 )
             else:
-                self.observation_space[brain_name] = spaces.Box(-high, high, dtype=np.float32)
+                self.observation_space.append(spaces.Box(-high, high, dtype=np.float32))
 
     def reset(self):
         """Resets the state of the environment and returns an initial observation.
@@ -119,10 +114,10 @@ class UnityEnv(gym.Env):
        
         info_all = self._env.reset()
         self.agents = {}
-        obs = {}
+        obs = []
         for brain_name in self.brain_names:
             brain_info = info_all[brain_name]
-            obs[brain_name] = brain_info.vector_observations
+            obs.append(brain_info.vector_observations[0])
             self.agents[brain_name] = len(brain_info.vector_observations)
         return obs
 
@@ -162,17 +157,19 @@ class UnityEnv(gym.Env):
         #     if self._flattener is not None:
         #         # Translate action into list
         #         action = self._flattener.lookup_action(action)
-
-        info_all = self._env.step(action)
-        obs = {}
-        reward = {}
-        done = {}
+        brains_action = {}
+        for brain in self.brain_names:
+            brains_action[brain] = action[self.brain_names.index(brain)]
+        info_all = self._env.step(brains_action)
+        obs = []
+        reward = []
+        done = []
         
         for brain_name in self.brain_names:
             brain_info = info_all[brain_name]
-            obs[brain_name] = brain_info.vector_observations
-            reward[brain_name] = brain_info.rewards
-            done[brain_name] = brain_info.local_done
+            obs.append(brain_info.vector_observations[0])
+            reward.append(brain_info.rewards[0])
+            done.append(brain_info.local_done[0])
         # n_agents = len(info.agents)
         # self._check_agents(n_agents)
         # self._current_state = info
