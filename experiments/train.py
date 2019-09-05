@@ -38,29 +38,6 @@ def parse_args():
     parser.add_argument("--plots-dir", type=str, default="./learning_curves/", help="directory where plot data is saved")
     return parser.parse_args()
 
-# class parse_args(object):
-#     def __int__(self):
-#         self.max_episode_len = 25
-#         self.num_episodes = 20000
-#         self.num_adversaries = 0
-#         self.good_policy = "maddpg"
-#         self.adv_policy = "maddpg"
-#         # Core training parameters
-#         self.lr = 1e-2
-#         self.gamma = 0.95
-#         self.batch_size = 1024
-#         self.num_units = 64
-#         # Checkpointing
-#         self.save_dir = "./tmp/policy/"
-#         self.save_rate = 1000
-#         self.load_dir = ""
-#         # Evaluation
-#         self.restore = False
-#         self.display = False
-#         self.plots_dir = "./learning_curves/"
-#
-
-
 def mlp_model(input, num_outputs, scope, reuse=False, num_units=64, rnn_cell=None):
     # This model takes as input an observation and returns values of all actions
     with tf.variable_scope(scope, reuse=reuse):
@@ -208,7 +185,7 @@ def write_summary(summary_writer, episode, all_agents_episode_reward):
         :param global_step: The number of steps the simulation has been going for
         """
         summary = tf.Summary()
-        summary.value.add(tag='all_agents_episode_reward', simple_value=all_agents_episode_reward)
+        summary.Value.add(tag='all_agents_episode_reward', simple_value=all_agents_episode_reward)
         #summary.value.add(tag='all_agents_episode_reward', simple_value=all_agents_episode_reward)
         summary_writer.add_summary(summary, episode)
         summary_writer.flush()

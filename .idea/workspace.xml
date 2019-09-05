@@ -8,17 +8,30 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1QMSCCOerC9oPtfu3ikKaH8eWxK" />
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="settings.github" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/mlagents" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Abluc\Desktop\UnityEnvTools\RLAlgorithms" />
+      <recent name="C:\Users\Abluc\Desktop\UnityEnvTools" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Abluc\Desktop\UnityEnvTools\mlagents" />
       <recent name="C:\Users\Abluc\Desktop\UnityEnvTools" />
     </key>
   </component>
@@ -87,7 +100,7 @@
     </recent_temporary>
   </component>
   <component name="SvnConfiguration">
-    <configuration />
+    <configuration>C:\Users\Abluc\AppData\Roaming\Subversion</configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -98,6 +111,7 @@
       <updated>1565160810982</updated>
       <workItem from="1567578844182" duration="2510000" />
       <workItem from="1567592305788" duration="8214000" />
+      <workItem from="1567647432942" duration="100000" />
     </task>
     <servers />
   </component>
