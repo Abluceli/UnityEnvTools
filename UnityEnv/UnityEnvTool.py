@@ -70,6 +70,7 @@ class UnityEnv(gym.Env):
         for brain_name in self.brain_names:
             brain = self.brains[brain_name]
             if brain.vector_action_space_type == "discrete":
+                self.action_type = 'discrete'
                 if len(brain.vector_action_space_size) == 1:
                     self.action_space.append(spaces.Discrete(brain.vector_action_space_size[0]))
                 else:
@@ -82,6 +83,7 @@ class UnityEnv(gym.Env):
                     ))
 
             else:
+                self.action_type = 'continuous'
                 high = np.array([1] * brain.vector_action_space_size[0])
                 self.action_space.append(spaces.Box(-high, high, dtype=np.float32))
             #np.inf mean the max number in python

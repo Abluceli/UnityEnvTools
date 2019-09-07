@@ -13,22 +13,16 @@ if __name__ == "__main__":
     obs = env.reset()
     print(env.agents)
     print(env.n)
-    for i in range(10000):
-        action = []
-        for brain_name in env.brain_names:
-            action.append(env.action_space[env.brain_names.index(brain_name)].sample())
-        obs, reward, done, info = env.step(action)
-        
-    # info = env.reset()[env.brain_names[0]]
-    # obs = info.vector_observations
-    # print(np.array(obs).shape)
-    # print(obs)
-    # count = 0
-    # for i in obs[0]:
-    #     if i == 0.0:
-    #         count += 1
-    # print(count)
+    print(env.observation_space[0].shape[0])
+    print(env.action_space[0].dtype)
+    # for i in range(10000):
+    #     action = []
+    #     for brain_name in env.brain_names:
+    #         action.append(env.action_space[env.brain_names.index(brain_name)].sample())
+    #     obs, reward, done, info = env.step(action)
+
     env.close()
+    import os
+    print(os.path)
   
 
-  
